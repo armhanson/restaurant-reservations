@@ -67,3 +67,81 @@ export async function listReservations(params, signal) {
     .then(formatReservationDate)
     .then(formatReservationTime);
 }
+
+export async function listReservationsForPhoneNumber(mobile_number, signal) {
+  const url = `${API_BASE_URL}/reservations?mobile_number=${mobile_number}`;
+  return await fetchJson(url, { headers, signal }, []);
+}
+
+export async function listTables(signal) {
+  const url = `${API_BASE_URL}/tables`;
+  return await fetchJson(url, { headers, signal }, []);
+}
+
+export async function readReservation(id, signal) {
+  const url = `${API_BASE_URL}/reservations/${id}`;
+  return await fetchJson(url, { headers, signal }, []);
+}
+
+export async function createReservation(reservation, signal) {
+  const url = `${API_BASE_URL}/reservations`;
+  reservation.people = Number(reservation.people);
+  const options = {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ data: reservation }),
+  };
+  return await fetchJson(url, options)
+    .then(formatReservationDate)
+    .then(formatReservationTime);
+}
+
+export function formatPhoneNumber(value) {
+  if (!value) return value;
+  const phoneNumber = value.replace(/[^\d]/g, "");
+  const phoneNumberLength = phoneNumber.length;
+  if (phoneNumberLength < 5) return phoneNumber;
+  if (phoneNumberLength < 8) {
+    return `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(3)}`;
+  }
+  return `${phoneNumber.slice(0, 3)}-${phoneNumber.slice(
+    3,
+    6
+  )}-${phoneNumber.slice(6, 10)}`;
+}
+
+export async function createTable(table, signal) {
+  const url = `${API_BASE_URL}/tables`;
+  table.capacity = +table.capacity;
+  return await fetchJson(
+    url,
+    {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ data: table }),
+      signal,
+    },
+    []
+  );
+}
+
+export async function updateTable(table_id, reservation_id, signal) {
+  const url = `${API_BASE_URL}/tables/${table_id}/seat`;
+  return await fetchJson(
+    url,
+    {
+      body: JSON.stringify({ data: { reservation_id } }),
+      headers,
+      method: "PUT",
+      signal,
+    },
+    []
+  );
+}
+
+export async function updateReservationStatus() {}
+
+export async function deletePartyFromTable(table_id, signal) {
+  const url = `${API_BASE_URL}/tables/${table_id}/seat`;
+  return await fetch(url, { headers, method: "DELETE", signal }, []);
+}
