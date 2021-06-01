@@ -2,15 +2,16 @@ import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 import ErrorAlert from "../layout/ErrorAlert";
 import { createTable } from "../utils/api";
+import { today } from "../utils/date-time"
 
-export default function NewTable() {
+export default function NewTable({ tables, setTables }) {
   const history = useHistory();
-  const todaysDate = new Date();
+  const todaysDate = today();
   const [error, setError] = useState([]);
   const [formData, setFormData] = useState({
     // initial (default) data
     table_name: "",
-    capacity: 1,
+    capacity: 0,
   });
 
   function validateFields() {
@@ -23,7 +24,7 @@ export default function NewTable() {
         foundError += "Table name must be at least 2 characters.";
       }
       if (formData.capacity < 1 || !formData.capacity) {
-        foundError += "Table name must be at least 1.";
+        foundError += "Table capacity must be at least 1.";
       }
     }
 
@@ -44,7 +45,10 @@ export default function NewTable() {
     setError(null);
     if (validateFields()) {
       createTable(formData, abortController.signal)
-        .then(() => history.push("/dashboard"))
+        .then((returnedTable) =>
+          setTables([...tables, { ...returnedTable, status: "free" }])
+        )
+        .then(() => history.push(`/dashboard?date=${todaysDate}`))
         .catch(setError);
     }
   }

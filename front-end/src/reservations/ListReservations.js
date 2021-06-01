@@ -1,8 +1,8 @@
 import React from "react";
+
 // import { Status } from "../tables/Status";
 
 export default function ListReservations({ reservations }) {
-  const reservation_id = reservations.reservation_id;
 
   if (reservations) {
     return reservations.map((reservation) => (
@@ -18,8 +18,10 @@ export default function ListReservations({ reservations }) {
             <p className="card-text">{reservation.people}</p>
             <p className="card-text">{}</p>
           </div>
-          <button type="button" href={`/reservations/${reservation_id}/seat`}>
-            Seat
+          <button type="button">
+            <div>
+              <a href={`/reservations/${reservation.reservation_id}/seat`}>Seat</a>
+            </div>
           </button>
         </div>
       </div>

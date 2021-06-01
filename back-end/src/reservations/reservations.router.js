@@ -16,5 +16,10 @@ router
   .post(controller.create)
   .all(methodNotAllowed);
 
+// router
+//   .route("/:reservation_id/seat")
+//   .get(controller.read)
+//   .put(controller.update)
+//   .all(methodNotAllowed);
 
 module.exports = router;

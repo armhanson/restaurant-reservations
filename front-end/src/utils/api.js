@@ -5,7 +5,7 @@
 import formatReservationDate from "./format-reservation-date";
 import formatReservationTime from "./format-reservation-date";
 
-const API_BASE_URL =
+export const API_BASE_URL =
   process.env.REACT_APP_API_BASE_URL || "http://localhost:5000";
 
 /**
@@ -130,9 +130,9 @@ export async function updateTable(table_id, reservation_id, signal) {
   return await fetchJson(
     url,
     {
-      body: JSON.stringify({ data: { reservation_id } }),
-      headers,
       method: "PUT",
+      headers,
+      body: JSON.stringify({ data: { reservation_id } }),
       signal,
     },
     []

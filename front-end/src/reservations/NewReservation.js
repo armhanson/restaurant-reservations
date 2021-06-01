@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 import { createReservation, formatPhoneNumber } from "../utils/api";
+import { today } from "../utils/date-time";
 import ErrorAlert from "../layout/ErrorAlert";
 
 export default function NewReservation() {
@@ -18,39 +19,38 @@ export default function NewReservation() {
   function valiDate() {
     const reserveDate = new Date(formData.reservation_date);
     const reserveTime = formData.reservation_time;
-    const todaysDate = new Date();
+    const todaysDate = today();
     const foundErrors = [];
 
     // this test sometimes references Tue as 1, sometimes as 2
     if (reserveDate.getDay() === 1) {
-      foundErrors.push({
-        message:
-          "Reservations cannot be made on a Tuesday (Restaurant is closed).",
-      });
+      foundErrors.push(
+        "Reservations cannot be made on a Tuesday (Restaurant is closed)."
+      );
     }
 
     if (reserveDate < todaysDate) {
-      foundErrors.push({ message: "Reservations cannot be made in the past." });
+      foundErrors.push("Reservations cannot be made in the past.");
     }
 
     if (reserveTime.localeCompare("10:30") === -1) {
-      foundErrors.push({
-        message:
-          "Reservation cannot be made: Restaurant is not open until 10:30AM.",
-      });
+      foundErrors.push(
+        "Reservation cannot be made: Restaurant is not open until 10:30AM."
+      );
     } else if (reserveTime.localeCompare("21:30") === 1) {
-      foundErrors.push({
-        message:
-          "Reservation cannot be made: Restaurant is closed after 9:30PM.",
-      });
+      foundErrors.push(
+        "Reservation cannot be made: Restaurant is closed after 9:30PM."
+      );
     } else if (reserveTime.localeCompare("20:30") === 1) {
-      foundErrors.push({
-        message:
-          "Reservation cannot be made: Reservation must be made before 8:30PM.",
-      });
+      foundErrors.push(
+        "Reservation cannot be made: Reservation must be made before 8:30PM."
+      );
     }
-
-    return foundErrors;
+    if (foundErrors.length) {
+      setErrors(new Error(foundErrors.toString()));
+      return false;
+    }
+    return true;
   }
 
   function handleChange({ target }) {
@@ -65,23 +65,23 @@ export default function NewReservation() {
     });
   };
 
-  async function handleSubmit(event) {
+  function handleSubmit(event) {
     event.preventDefault();
     setErrors(null);
-    const errorsArr = valiDate();
-    if (!errorsArr.length) {
-      await createReservation(formData);
-      history.push(`/dashboard?date=${formData.reservation_date}`);
-    } else {
-      const errorMessage = { message: `${errorsArr.join(", ").trim()}.` };
-      setErrors(errorMessage);
+    const validDate = valiDate();
+    if (validDate) {
+      createReservation(formData)
+        .then(() =>
+          history.push(`/dashboard?date=${formData.reservation_date}`)
+        )
+        .catch(setErrors);
     }
   }
 
   return (
     <>
       <form onSubmit={handleSubmit}>
-        { errors && <ErrorAlert error={errors} /> }
+        <ErrorAlert error={errors} />
         <label htmlFor="first_name">First Name:&nbsp;</label>
         <input
           name="first_name"

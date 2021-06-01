@@ -137,6 +137,10 @@ async function read(req, res) {
   res.json({ data: reservation });
 }
 
+// async function update(req, res) {
+  
+// }
+
 module.exports = {
   list: asyncErrorBoundary(list),
   create: [validateFields, asyncErrorBoundary(create)],
