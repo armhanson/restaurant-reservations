@@ -28,7 +28,6 @@ function validateFields(req, res, next) {
   });
 
   if (data.table_name === "" || data.table_name === undefined) {
-
     return next({
       status: 400,
       message: "table_name value is missing.",
@@ -63,7 +62,7 @@ async function tableExists(req, res, next) {
     return next();
   } else {
     return next({
-      status: 400,
+      status: 404,
       message: `Table: ${tableId} is missing.`,
     });
   }
@@ -107,6 +106,22 @@ async function updateValidation(req, res, next) {
   next();
 }
 
+async function deleteValidation(req, res, next) {
+  const tableId = req.params.table_id;
+
+  const table = await service.read(tableId);
+
+  if (!table.reservation_id) {
+    return next({
+      status: 400,
+      message: "Table is not occupied.",
+    });
+  }
+  res.locals.table = table;
+
+  return next();
+}
+
 async function create(req, res) {
   const makeTable = ({ table_name, capacity, reservation_id } = req.body.data);
   const createdTable = await service.create(makeTable);
@@ -132,6 +147,11 @@ async function update(req, res) {
   res.status(200).json({ data: updatedData });
 }
 
+async function destroy(req, res) {
+  await service.destroy(res.locals.table.reservation_id);
+  res.sendStatus(200).json(`${req.params.table_id} table_id is occupied.`);
+}
+
 module.exports = {
   create: [validateFields, asyncErrorBoundary(create)],
   list: asyncErrorBoundary(list),
@@ -140,5 +160,10 @@ module.exports = {
     asyncErrorBoundary(tableExists),
     asyncErrorBoundary(updateValidation),
     asyncErrorBoundary(update),
+  ],
+  delete: [
+    asyncErrorBoundary(tableExists),
+    asyncErrorBoundary(deleteValidation),
+    asyncErrorBoundary(destroy),
   ],
 };
