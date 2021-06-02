@@ -3,7 +3,6 @@ import { useHistory } from "react-router";
 import { deletePartyFromTable, listTables } from "../utils/api";
 
 export default function ListTables({ tables, setTables }) {
-  const history = useHistory();
 
   function handleFinish({ table_id }) {
     const result = window.confirm(

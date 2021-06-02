@@ -11,13 +11,14 @@ export default function ListReservations({ reservations }) {
             <h4 className="card-title">
               Reservation {reservation.first_name} {reservation.last_name}
             </h4>
+            {reservation.status}
             <p className="card-text">{reservation.mobile_number}</p>
             <p className="card-text">{reservation.reservation_date}</p>
             <p className="card-text">{reservation.reservation_time}</p>
             <p className="card-text">{reservation.people}</p>
             <p className="card-text">{}</p>
           </div>
-          <button type="button">
+          <button type="btn btn-small">
             <div>
               <a href={`/reservations/${reservation.reservation_id}/seat`}>
                 Seat

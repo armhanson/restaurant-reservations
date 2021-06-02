@@ -21,11 +21,13 @@ function read(table_id) {
 function update(updatedTable) {
   return knex(tableName)
     .where({ table_id: updatedTable.table_id })
-    .update(updatedTable, "*");
+    .update(updatedTable, "*")
+    .returning("*")
+    .then((theNewStuff) => theNewStuff[0]);
 }
 
 function destroy(table_id, reservationId) {
-  return knex(tableName).where({ table_id }).update( "reservation_id", null );
+  return knex(tableName).where({ table_id }).update("reservation_id", null);
 }
 
 module.exports = {

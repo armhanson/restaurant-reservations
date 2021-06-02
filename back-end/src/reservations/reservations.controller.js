@@ -39,8 +39,9 @@ function notNull(obj) {
 function validateFields(req, res, next) {
   const { data = {} } = req.body;
 
-
   const dataFields = Object.getOwnPropertyNames(data);
+  const reserveDate = new Date(data.reservation_date);
+  const todaysDate = new Date();
 
   VALID_FIELDS.forEach((field) => {
     if (!dataFields.includes(field)) {
@@ -58,11 +59,6 @@ function validateFields(req, res, next) {
         "Invalid data format provided. Requires {string: [first_name, last_name, mobile_number], date: reservation_date, time: reservation_time, number: people}",
     });
   }
-  const reserveDate = new Date(data.reservation_date);
-  // start = new Date(`${data.reservation_date} 10:30:00 GMT-500`),
-  // end = new Date(`${data.reservation_date} 21:30:00 GMT-500`);
-
-  const todaysDate = new Date();
 
   if (typeof data.people !== "number") {
     return next({
@@ -77,7 +73,7 @@ function validateFields(req, res, next) {
       message: "reservation_date is not a date.",
     });
   }
-  
+
   if (reserveDate.getDay() === 1) {
     return next({
       status: 400,
@@ -110,7 +106,54 @@ function validateFields(req, res, next) {
   next();
 }
 
+// US-06 - Reservation status
+//     POST /reservations
+//       ✓ returns 201 if status is 'booked' (489 ms)
+//       ✕ returns 400 if status is 'seated' (390 ms)
+//       ✕ returns 400 if status is 'finished' (372 ms)
+//     PUT /reservations/:reservation_id/status
+//       ✕ returns 404 for non-existent reservation_id (370 ms)
+//       ✕ returns 400 for unknown status (376 ms)
+//       ✕ returns 400 if status is currently finished (a finished reservation cannot be updated) (439 ms)
+//       ✕ returns 200 for status 'booked' (370 ms)
+//       ✕ returns 200 for status 'seated' (362 ms)
+//       ✕ returns 200 for status 'finished' (402 ms)
+//     PUT /tables/:table_id/seat
+//       ✕ returns 200 and changes reservation status to 'seated' (676 ms)
+//       ✕ returns 400 if reservation is already 'seated' (750 ms)
+//     DELETE /tables/:table_id/seat
+//       ✕ returns 200 and changes reservation status to 'finished' (826 ms)
+//     GET /reservations/date=XXXX-XX-XX
+//       ✓ does not include 'finished' reservations (1060 ms)
+
 //////////// END ///////////////
+
+//////// UPDATE VALIDATION ////////
+
+function updateValidation() {
+  const status = res.locals.reservation.status;
+
+  if (status !== "booked") {
+    return next({
+      status: 400,
+      message: "Reservation has been seated.",
+    });
+  }
+
+  if (
+    status !== "booked" &&
+    status !== "seated" &&
+    status !== "finished" &&
+    status !== "cancelled"
+  ) {
+    return next({
+      status: 400,
+      message: "Unknown status.",
+    });
+  }
+
+  return next();
+}
 
 async function list(req, res) {
   const { date } = req.query;
@@ -137,12 +180,21 @@ async function read(req, res) {
   res.json({ data: reservation });
 }
 
-// async function update(req, res) {
-  
-// }
+async function update(req, res) {
+  const reservation_id = req.params.reservation_id;
+  const status = req.body.data.status;
+
+  const updateStatus = await service.update(reservation_id, status);
+  res.status(200).json({ data: updateStatus });
+}
 
 module.exports = {
   list: asyncErrorBoundary(list),
   create: [validateFields, asyncErrorBoundary(create)],
-  read: [asyncErrorBoundary(reservationExists), read],
+  read: [asyncErrorBoundary(reservationExists), asyncErrorBoundary(read)],
+  update: [
+    asyncErrorBoundary(reservationExists),
+    updateValidation,
+    asyncErrorBoundary(update),
+  ],
 };
