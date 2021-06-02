@@ -46,6 +46,8 @@ export default function NewReservation() {
         "Reservation cannot be made: Reservation must be made before 8:30PM."
       );
     }
+    console.log("FOUND", foundErrors)
+
     if (foundErrors.length) {
       setErrors(new Error(foundErrors.toString()));
       return false;

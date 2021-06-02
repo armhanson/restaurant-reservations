@@ -34,6 +34,9 @@ export default function SeatReservation({ tables, setTables }) {
     if (tableId.capacity < reservation_id.people) {
       foundErrors.push("Table selected cannot seat number of people.");
     }
+
+    console.log("FOUND", foundErrors)
+    
     if (foundErrors) {
       setErrors(new Error(foundErrors.toString()));
       return false;

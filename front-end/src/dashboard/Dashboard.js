@@ -18,6 +18,7 @@ function Dashboard({
   reservations,
   reservationsError,
   tables,
+  setTables,
   tablesError,
 }) {
   const history = useHistory();
@@ -74,7 +75,7 @@ function Dashboard({
 
       <ErrorAlert error={tablesError} />
 
-      <ListTables tables={tables} />
+      <ListTables tables={tables} setTables={setTables} />
     </main>
   );
 }

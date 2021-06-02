@@ -123,9 +123,8 @@ async function deleteValidation(req, res, next) {
 }
 
 async function create(req, res) {
-  const makeTable = ({ table_name, capacity, reservation_id } = req.body.data);
-  const createdTable = await service.create(makeTable);
-  res.status(201).json({ data: createdTable });
+  const data = await service.create(req.body.data);
+  res.status(201).json({ data });
 }
 
 async function list(req, res) {
@@ -148,7 +147,7 @@ async function update(req, res) {
 }
 
 async function destroy(req, res) {
-  await service.destroy(res.locals.table.reservation_id);
+  await service.destroy(res.locals.table.table_id);
   res.sendStatus(200).json(`${req.params.table_id} table_id is occupied.`);
 }
 

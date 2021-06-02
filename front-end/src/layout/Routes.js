@@ -20,7 +20,7 @@ import SeatReservation from "../reservations/SeatReservation";
  */
 function Routes() {
   const query = useQuery();
-  const date = query.get("date");
+  const date = query.get("date") || today();
   let reservation_id;
 
   const [reservations, setReservations] = useState([]);
@@ -61,6 +61,7 @@ function Routes() {
           reservations={reservations}
           reservationsError={reservationsError}
           tables={tables}
+          setTables={setTables}
           tablesError={tablesError}
         />
       </Route>
