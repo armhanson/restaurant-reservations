@@ -29,9 +29,18 @@ function update(reservation_id, status) {
     .then((theNewStuff) => theNewStuff[0]);
 }
 
+function finish(reservation_id, status) {
+  return knex(tableName)
+    .where({ reservation_id })
+    .update("status", status)
+    .returning("*")
+    .then((finished) => finished[0]);
+}
+
 module.exports = {
   create,
   list,
   read,
   update,
+  finish,
 };

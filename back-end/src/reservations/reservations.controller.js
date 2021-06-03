@@ -40,7 +40,7 @@ function validateFields(req, res, next) {
   const { data = {} } = req.body;
 
   const dataFields = Object.getOwnPropertyNames(data);
-  const reserveDate = new Date(data.reservation_date);
+  const reserveDate = new Date(+data.reservation_date);
   const todaysDate = new Date();
 
   VALID_FIELDS.forEach((field) => {
@@ -103,42 +103,56 @@ function validateFields(req, res, next) {
     });
   }
 
+  if (req.body.data.status && req.body.data.status !== "booked") {
+    return next({
+      status: 400,
+      message: `'status' field cannot be ${req.body.data.status}`,
+    });
+  }
+
   next();
 }
 
-// US-06 - Reservation status
-//     POST /reservations
-//       ✓ returns 201 if status is 'booked' (489 ms)
-//       ✕ returns 400 if status is 'seated' (390 ms)
-//       ✕ returns 400 if status is 'finished' (372 ms)
-//     PUT /reservations/:reservation_id/status
-//       ✕ returns 404 for non-existent reservation_id (370 ms)
-//       ✕ returns 400 for unknown status (376 ms)
-//       ✕ returns 400 if status is currently finished (a finished reservation cannot be updated) (439 ms)
-//       ✕ returns 200 for status 'booked' (370 ms)
-//       ✕ returns 200 for status 'seated' (362 ms)
-//       ✕ returns 200 for status 'finished' (402 ms)
-//     PUT /tables/:table_id/seat
-//       ✕ returns 200 and changes reservation status to 'seated' (676 ms)
-//       ✕ returns 400 if reservation is already 'seated' (750 ms)
-//     DELETE /tables/:table_id/seat
-//       ✕ returns 200 and changes reservation status to 'finished' (826 ms)
-//     GET /reservations/date=XXXX-XX-XX
-//       ✓ does not include 'finished' reservations (1060 ms)
+function statusCreateValidation(req, res, next) {
+  const status = req.body.data.status;
 
-//////////// END ///////////////
-
-//////// UPDATE VALIDATION ////////
-
-function updateValidation() {
-  const status = res.locals.reservation.status;
-
-  if (status !== "booked") {
+  if (status === "seated") {
     return next({
       status: 400,
       message: "Reservation has been seated.",
     });
   }
+
+  next();
+}
+
+function statusValidation(req, res, next) {
+  const status = req.body.data.status;
+
+  if (status === "seated") {
+    return next({
+      status: 400,
+      message: "Reservation has been seated.",
+    });
+  }
+
+  if (status) {
+    return next({
+      status: 400,
+      message: "Unknown status.",
+    });
+  }
+
+  next();
+}
+
+//////////// END ///////////////
+
+//////// UPDATE VALIDATION ////////
+
+function updateValidation(req, res, next) {
+  const status = req.body.data.status;
+  const special = res.locals.reservation.status;
 
   if (
     status !== "booked" &&
@@ -148,7 +162,14 @@ function updateValidation() {
   ) {
     return next({
       status: 400,
-      message: "Unknown status.",
+      message: "unknown status.",
+    });
+  }
+
+  if (special === "finished") {
+    return next({
+      status: 400,
+      message: "a finished table cannot be updated.",
     });
   }
 

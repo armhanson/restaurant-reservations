@@ -2,12 +2,12 @@ import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 import ErrorAlert from "../layout/ErrorAlert";
 import { createTable } from "../utils/api";
-import { today } from "../utils/date-time"
+import { today } from "../utils/date-time";
 
 export default function NewTable({ tables, setTables }) {
   const history = useHistory();
   const todaysDate = today();
-  const [error, setError] = useState([]);
+  const [error, setError] = useState(null);
   const [formData, setFormData] = useState({
     // initial (default) data
     table_name: "",
@@ -55,7 +55,7 @@ export default function NewTable({ tables, setTables }) {
 
   return (
     <form onSubmit={handleSubmit}>
-      <ErrorAlert error={error} />
+      {error ? <ErrorAlert error={error} /> : ""}
 
       <label htmlFor="table_name">Table Name:&nbsp;</label>
       <input

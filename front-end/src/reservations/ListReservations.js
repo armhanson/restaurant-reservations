@@ -9,7 +9,7 @@ export default function ListReservations({ reservations }) {
         <div className="card">
           <div className="card-body">
             <h4 className="card-title">
-              Reservation {reservation.first_name} {reservation.last_name}
+              Reservation for: {reservation.first_name} {reservation.last_name}
             </h4>
             {reservation.status}
             <p className="card-text">{reservation.mobile_number}</p>

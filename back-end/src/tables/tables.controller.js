@@ -59,9 +59,9 @@ async function tableExists(req, res, next) {
 
   if (table) {
     res.locals.table = table;
-    return next();
+    next();
   } else {
-    return next({
+    next({
       status: 404,
       message: `Table: ${tableId} is missing.`,
     });
@@ -106,6 +106,24 @@ async function updateValidation(req, res, next) {
   next();
 }
 
+async function tableIsOccupied(req, res, next) {
+  const reservation_id = req.body.data.reservation_id;
+
+  if (reservation_id) {
+    const reservationStatus = await reservationsService.read(+reservation_id);
+
+    console.log(reservationStatus.status);
+
+    if (reservationStatus.status === "seated") {
+      return next({
+        status: 400,
+        message: "This reservation has already been seated.",
+      });
+    }
+  }
+  next();
+}
+
 async function deleteValidation(req, res, next) {
   const tableId = req.params.table_id;
 
@@ -142,10 +160,19 @@ async function update(req, res) {
     reservation_id: +req.body.data.reservation_id,
   };
 
-  await reservationsService.update(+req.body.data.reservation_id, "seated");
+  await reservationsService.update(
+    Number(req.body.data.reservation_id),
+    "seated"
+  );
 
   const updatedData = await service.update(updatedTable);
   res.status(200).json({ data: updatedData });
+}
+
+async function finish(req, res) {
+  const data = await service.finish(res.locals.table);
+
+  res.json({ data });
 }
 
 async function destroy(req, res) {
@@ -159,7 +186,8 @@ module.exports = {
   read: [validateFields, asyncErrorBoundary(read)],
   update: [
     asyncErrorBoundary(tableExists),
-    asyncErrorBoundary(updateValidation),
+    updateValidation,
+    tableIsOccupied,
     asyncErrorBoundary(update),
   ],
   delete: [
@@ -167,4 +195,5 @@ module.exports = {
     asyncErrorBoundary(deleteValidation),
     asyncErrorBoundary(destroy),
   ],
+  finish: [asyncErrorBoundary(tableExists), asyncErrorBoundary(finish)],
 };

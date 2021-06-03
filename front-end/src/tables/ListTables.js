@@ -10,7 +10,6 @@ export default function ListTables({ tables, setTables }) {
     );
 
     if (result) {
-      console.log(table_id);
       deletePartyFromTable(table_id)
         .then(() => listTables())
         .then(setTables)
