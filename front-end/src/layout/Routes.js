@@ -10,6 +10,7 @@ import { listReservations, listTables } from "../utils/api";
 import NewReservation from "../reservations/NewReservation";
 import SeatConfirm from "../reservations/SeatConfirm";
 import SeatReservation from "../reservations/SeatReservation";
+import Search from "../reservations/Search";
 
 /**
  * Defines all the routes for the application.
@@ -21,15 +22,14 @@ import SeatReservation from "../reservations/SeatReservation";
 function Routes() {
   const query = useQuery();
   const date = query.get("date") || today();
-  let reservation_id;
 
   const [reservations, setReservations] = useState([]);
   const [reservationsError, setReservationsError] = useState(null);
   const [tables, setTables] = useState([]);
   const [tablesError, setTablesError] = [];
 
-    // render dashboard anytime new date or setTablesError occurs
-  useEffect(loadDashboard, [date, setTablesError]);
+  // render dashboard anytime new date or setTablesError occurs
+  useEffect(loadDashboard, [date]);
 
   function loadDashboard() {
     const abortController = new AbortController();
@@ -50,7 +50,7 @@ function Routes() {
         <Redirect to={"/dashboard"} />
       </Route>
       <Route exact={true} path="/reservations/new">
-        <NewReservation />
+        <NewReservation setReservations={setReservations} />
       </Route>
       <Route exact={true} path="/tables/new">
         <NewTable tables={tables} setTables={setTables} />
@@ -59,6 +59,7 @@ function Routes() {
         <Dashboard
           date={date ? date : today()}
           reservations={reservations}
+          setReservations={setReservations}
           reservationsError={reservationsError}
           tables={tables}
           setTables={setTables}
@@ -66,10 +67,17 @@ function Routes() {
         />
       </Route>
       <Route exact={true} path={`/reservations/:reservation_id/seat`}>
-        <SeatReservation tables={tables} setTables={setTables} />
+        <SeatReservation
+          tables={tables}
+          setTables={setTables}
+          setReservations={setReservations}
+        />
       </Route>
       <Route exact={true} path={`/reservations/seat-confirm`}>
         <SeatConfirm tables={tables} />
+      </Route>
+      <Route exact={true} path={`/search`}>
+        <Search reservations={reservations} setReservations={setReservations} />
       </Route>
       <Route>
         <NotFound />

@@ -40,7 +40,10 @@ function validateFields(req, res, next) {
   const { data = {} } = req.body;
 
   const dataFields = Object.getOwnPropertyNames(data);
-  const reserveDate = new Date(+data.reservation_date);
+  const reserveDate = new Date(data.reservation_date);
+  const reserveDateAndTime = new Date(
+    `${data.reservation_date}T${data.reservation_time}`
+  );
   const todaysDate = new Date();
 
   VALID_FIELDS.forEach((field) => {
@@ -82,7 +85,7 @@ function validateFields(req, res, next) {
     });
   }
 
-  if (reserveDate < todaysDate) {
+  if (reserveDateAndTime.getTime() < Date.now()) {
     return next({
       status: 400,
       message: "Reservations must be made for a future date.",
@@ -177,10 +180,16 @@ function updateValidation(req, res, next) {
 }
 
 async function list(req, res) {
-  const { date } = req.query;
-  res.json({
-    data: await service.list(date),
-  });
+  const { date, mobile_number } = req.query;
+  if (date) {
+    return res.json({
+      data: await service.list(date),
+    });
+  } else {
+    return res.json({
+      data: await service.search(mobile_number),
+    });
+  }
 }
 
 async function create(req, res) {

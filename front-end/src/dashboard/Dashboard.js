@@ -2,8 +2,6 @@ import React from "react";
 import ErrorAlert from "../layout/ErrorAlert";
 import { previous, today, next } from "../utils/date-time";
 import { useHistory } from "react-router-dom";
-// import TableRow from "./TableRow";
-// import ReservationRow from "./ReservationRow";
 import ListTables from "../tables/ListTables";
 import ListReservations from "../reservations/ListReservations";
 
@@ -16,6 +14,7 @@ import ListReservations from "../reservations/ListReservations";
 function Dashboard({
   date,
   reservations,
+  setReservations,
   reservationsError,
   tables,
   setTables,
@@ -67,6 +66,7 @@ function Dashboard({
       >
         Next
       </button>
+      
       <ErrorAlert error={reservationsError} />
 
       <ListReservations reservations={reservations} />
@@ -75,7 +75,7 @@ function Dashboard({
 
       <ErrorAlert error={tablesError} />
 
-      <ListTables tables={tables} setTables={setTables} />
+      <ListTables tables={tables} setTables={setTables} date={date} setReservations={setReservations} />
     </main>
   );
 }

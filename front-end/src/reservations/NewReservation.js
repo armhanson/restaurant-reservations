@@ -1,10 +1,13 @@
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
-import { createReservation, formatPhoneNumber } from "../utils/api";
-import { today } from "../utils/date-time";
+import {
+  createReservation,
+  formatPhoneNumber,
+  listReservations,
+} from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
 
-export default function NewReservation() {
+export default function NewReservation({ setReservations }) {
   const [errors, setErrors] = useState(null);
   const history = useHistory();
   const [formData, setFormData] = useState({
@@ -19,7 +22,10 @@ export default function NewReservation() {
   function valiDate() {
     const reserveDate = new Date(formData.reservation_date);
     const reserveTime = formData.reservation_time;
-    const todaysDate = today();
+    const todaysDate = Date.now();
+    const dateAndTime = new Date(
+      `${formData.reservation_date}T${formData.reservation_time}`
+    );
     const foundErrors = [];
 
     // this test sometimes references Tue as 1, sometimes as 2
@@ -29,7 +35,7 @@ export default function NewReservation() {
       );
     }
 
-    if (reserveDate < todaysDate) {
+    if (dateAndTime.getTime() < todaysDate) {
       foundErrors.push("Reservations cannot be made in the past.");
     }
 
@@ -72,9 +78,9 @@ export default function NewReservation() {
     const validDate = valiDate();
     if (validDate) {
       createReservation(formData)
-        .then(() =>
-          history.push(`/dashboard?date=${formData.reservation_date}`)
-        )
+        .then(() => listReservations({ date: formData.reservation_date }))
+        .then(setReservations)
+        .then(history.push(`/dashboard?date=${formData.reservation_date}`))
         .catch(setErrors);
     }
   }

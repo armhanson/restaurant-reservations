@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import ErrorAlert from "../layout/ErrorAlert";
-import { updateTable, listTables } from "../utils/api";
+import { updateTable, listTables, listReservations } from "../utils/api";
+import { today } from "../utils/date-time";
 
-export default function SeatReservation({ tables, setTables }) {
+
+export default function SeatReservation({ tables, setTables, setReservations }) {
   const history = useHistory();
   const { reservation_id } = useParams();
 
@@ -32,7 +34,7 @@ export default function SeatReservation({ tables, setTables }) {
     if (tableId.capacity < reservation_id.people) {
       foundErrors.push("Table selected cannot seat number of people.");
     }
-    
+
     if (foundErrors) {
       setErrors(new Error(foundErrors.toString()));
       return false;
@@ -46,8 +48,11 @@ export default function SeatReservation({ tables, setTables }) {
 
     if (validateSeat) {
       updateTable(tableId, reservation_id)
-        .then(() => listTables().then(setTables))
-        .then(() => history.push(`/dashboard`))
+        .then(() => listTables())
+        .then(setTables)
+        .then(() => listReservations({ date: today() }))
+        .then(setReservations)
+        .then(() => history.push("/dashboard"))
         .catch(setErrors);
     }
   }

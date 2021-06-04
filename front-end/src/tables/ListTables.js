@@ -1,18 +1,23 @@
 import React from "react";
-import { useHistory } from "react-router";
-import { deletePartyFromTable, listTables } from "../utils/api";
+import { today } from "../utils/date-time";
+import useQuery from "../utils/useQuery";
+import { deletePartyFromTable, listTables, listReservations } from "../utils/api";
 
-export default function ListTables({ tables, setTables }) {
-
+export default function ListTables({ tables, setTables, setReservations }) {
+  const query = useQuery();
+  const date = query.get("date") || today();
+  
   function handleFinish({ table_id }) {
     const result = window.confirm(
       "Is this table ready to seat new guests? This cannot be undone."
-    );
-
-    if (result) {
-      deletePartyFromTable(table_id)
+      );
+      
+      if (result) {
+        deletePartyFromTable(table_id)
         .then(() => listTables())
         .then(setTables)
+        .then(() => listReservations({ date }))
+        .then(setReservations)
         .catch(console.log);
     }
   }
