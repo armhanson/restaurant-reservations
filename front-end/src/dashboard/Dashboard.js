@@ -12,6 +12,7 @@ import ListReservations from "../reservations/ListReservations";
  * @returns {JSX.Element}
  */
 function Dashboard({
+  cancelHandler,
   date,
   reservations,
   setReservations,
@@ -19,6 +20,7 @@ function Dashboard({
   tables,
   setTables,
   tablesError,
+  setTablesError,
 }) {
   const history = useHistory();
 
@@ -69,7 +71,7 @@ function Dashboard({
       
       <ErrorAlert error={reservationsError} />
 
-      <ListReservations reservations={reservations} />
+      <ListReservations reservations={reservations} setReservations={setReservations} cancelHandler={cancelHandler} />
 
       <h4 className="mb-0">Tables</h4>
 

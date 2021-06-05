@@ -1,14 +1,12 @@
 import React from "react";
+import ReservationButtons from "./ReservationButtons";
 
-export default function ListReservations({ reservations }) {
-
+export default function ListReservations({ cancelHandler, reservations }) {
   if (reservations) {
     const filteredReservations = reservations.filter(
       (reservation) =>
         reservation.status !== "finished" && reservation.status !== "cancelled"
     );
-
-    
 
     return filteredReservations.map((reservation) => {
       return (
@@ -28,17 +26,13 @@ export default function ListReservations({ reservations }) {
               <p className="card-text">{reservation.people}</p>
               <p className="card-text">{}</p>
             </div>
-            <button type="btn btn-small">
-              <div>
-                {reservation.status === "booked" ? (
-                  <a href={`/reservations/${reservation.reservation_id}/seat` }>
-                    Seat
-                  </a>
-                ) : (
-                  ""
-                )}
-              </div>
-            </button>
+            <div>
+              <ReservationButtons
+                status={reservation.status}
+                reservation_id={reservation.reservation_id}
+                cancelHandler={cancelHandler}
+              />
+            </div>
           </div>
         </div>
       );

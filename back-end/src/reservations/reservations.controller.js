@@ -37,14 +37,13 @@ function notNull(obj) {
 /////////// VALIDATE FIELDS COMPONENT ///////////
 
 function validateFields(req, res, next) {
-  const { data = {} } = req.body;
+  const { data ={} } = req.body;
 
   const dataFields = Object.getOwnPropertyNames(data);
   const reserveDate = new Date(data.reservation_date);
   const reserveDateAndTime = new Date(
     `${data.reservation_date}T${data.reservation_time}`
   );
-  const todaysDate = new Date();
 
   VALID_FIELDS.forEach((field) => {
     if (!dataFields.includes(field)) {
@@ -156,7 +155,6 @@ function statusValidation(req, res, next) {
 function updateValidation(req, res, next) {
   const status = req.body.data.status;
   const special = res.locals.reservation.status;
-
   if (
     status !== "booked" &&
     status !== "seated" &&
@@ -218,6 +216,15 @@ async function update(req, res) {
   res.status(200).json({ data: updateStatus });
 }
 
+async function updateReservation(req, res) {
+  const updatedReservation = {
+    ...req.body.data,
+    reservation_id: res.locals.reservation.reservation_id,
+  };
+  const stuff = await service.updateReservation(updatedReservation);
+  res.json({ data: stuff[0] });
+}
+
 module.exports = {
   list: asyncErrorBoundary(list),
   create: [validateFields, asyncErrorBoundary(create)],
@@ -226,5 +233,10 @@ module.exports = {
     asyncErrorBoundary(reservationExists),
     updateValidation,
     asyncErrorBoundary(update),
+  ],
+  updateReservation: [
+    asyncErrorBoundary(reservationExists),
+    asyncErrorBoundary(validateFields),
+    asyncErrorBoundary(updateReservation),
   ],
 };

@@ -6,7 +6,11 @@ import NewTable from "../tables/NewTable";
 import { today } from "../utils/date-time";
 import Dashboard from "../dashboard/Dashboard";
 import { Redirect, Route, Switch } from "react-router-dom";
-import { listReservations, listTables } from "../utils/api";
+import {
+  listReservations,
+  listTables,
+  updateReservationStatus,
+} from "../utils/api";
 import NewReservation from "../reservations/NewReservation";
 import SeatConfirm from "../reservations/SeatConfirm";
 import SeatReservation from "../reservations/SeatReservation";
@@ -20,14 +24,13 @@ import Search from "../reservations/Search";
  * @returns {JSX.Element}
  */
 function Routes() {
-  const query = useQuery();
-  const date = query.get("date") || today();
-
   const [reservations, setReservations] = useState([]);
   const [reservationsError, setReservationsError] = useState(null);
   const [tables, setTables] = useState([]);
   const [tablesError, setTablesError] = [];
 
+  const query = useQuery();
+  const date = query.get("date") ? query.get("date") : today();
   // render dashboard anytime new date or setTablesError occurs
   useEffect(loadDashboard, [date]);
 
@@ -37,7 +40,27 @@ function Routes() {
     listReservations({ date }, abortController.signal)
       .then(setReservations)
       .catch(setReservationsError);
-    listTables(abortController.signal).then(setTables).catch(setTablesError);
+    listTables()
+      .then((existingTables) => {
+        const updatedExistingTables = existingTables.map((table) => {
+          return { ...table };
+        });
+        return updatedExistingTables;
+      })
+      .then(setTables)
+      .catch(setTablesError);
+    return () => abortController.abort();
+  }
+
+  function cancelHandler(reservation_id) {
+    const abortController = new AbortController();
+
+    updateReservationStatus(reservation_id, "cancelled", abortController.status)
+      .then(() => {
+        console.log("update successful");
+        return loadDashboard();
+      })
+      .catch(setReservationsError);
     return () => abortController.abort();
   }
 
@@ -50,20 +73,33 @@ function Routes() {
         <Redirect to={"/dashboard"} />
       </Route>
       <Route exact={true} path="/reservations/new">
-        <NewReservation setReservations={setReservations} />
+        <NewReservation
+          setReservations={setReservations}
+          loadDashboard={loadDashboard}
+        />
+      </Route>
+      <Route exact={true} path="/reservations/:reservation_id/edit">
+        <NewReservation
+          setReservations={setReservations}
+          edit={true}
+          loadDashboard={loadDashboard}
+          reservations={reservations}
+        />
       </Route>
       <Route exact={true} path="/tables/new">
         <NewTable tables={tables} setTables={setTables} />
       </Route>
       <Route exact={true} path="/dashboard">
         <Dashboard
-          date={date ? date : today()}
+          cancelHandler={cancelHandler}
+          date={date}
           reservations={reservations}
           setReservations={setReservations}
           reservationsError={reservationsError}
           tables={tables}
           setTables={setTables}
           tablesError={tablesError}
+          setTablesError={setTablesError}
         />
       </Route>
       <Route exact={true} path={`/reservations/:reservation_id/seat`}>

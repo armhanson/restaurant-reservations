@@ -1,13 +1,17 @@
-import React, { useState } from "react";
-import { useHistory } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useHistory, useParams } from "react-router-dom";
 import {
   createReservation,
+  editReservation,
   formatPhoneNumber,
-  listReservations,
+  readReservation,
 } from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
 
-export default function NewReservation({ setReservations }) {
+export default function NewReservation({
+  edit,
+  loadDashboard,
+}) {
   const [errors, setErrors] = useState(null);
   const history = useHistory();
   const [formData, setFormData] = useState({
@@ -19,6 +23,28 @@ export default function NewReservation({ setReservations }) {
     people: 1,
   });
 
+
+
+  const { reservation_id } = useParams();
+
+  useEffect(() => {
+    const abortController = new AbortController();
+    if (reservation_id) {
+      readReservation(reservation_id, abortController.signal)
+        .then((foundRes) => {
+
+          setFormData({
+            ...foundRes,
+            reservation_date: new Date(foundRes.reservation_date)
+              .toISOString()
+              .substr(0, 10),
+          });
+        })
+        .catch(setErrors);
+    }
+    return () => abortController.abort();
+  }, [reservation_id]);
+
   function valiDate() {
     const reserveDate = new Date(formData.reservation_date);
     const reserveTime = formData.reservation_time;
@@ -28,7 +54,6 @@ export default function NewReservation({ setReservations }) {
     );
     const foundErrors = [];
 
-    // this test sometimes references Tue as 1, sometimes as 2
     if (reserveDate.getDay() === 1) {
       foundErrors.push(
         "Reservations cannot be made on a Tuesday (Restaurant is closed)."
@@ -74,15 +99,31 @@ export default function NewReservation({ setReservations }) {
 
   function handleSubmit(event) {
     event.preventDefault();
+    const abortController = new AbortController();
     setErrors(null);
     const validDate = valiDate();
+
     if (validDate) {
-      createReservation(formData)
-        .then(() => listReservations({ date: formData.reservation_date }))
-        .then(setReservations)
-        .then(history.push(`/dashboard?date=${formData.reservation_date}`))
-        .catch(setErrors);
+      if (edit) {
+        editReservation(formData, reservation_id, abortController.signal)
+          .then(() => {
+
+            return loadDashboard();
+          })
+          .then(() =>
+            history.push(`/dashboard?date=${formData.reservation_date}`)
+          )
+          .catch(setErrors);
+      } else {
+        createReservation(formData, abortController.signal)
+          .then(loadDashboard)
+          .then(() =>
+            history.push(`/dashboard?date=${formData.reservation_date}`)
+          )
+          .catch(setErrors);
+      }
     }
+    return () => abortController.abort();
   }
 
   return (
@@ -126,7 +167,9 @@ export default function NewReservation({ setReservations }) {
           name="reservation_date"
           id="reservation_date"
           type="date"
-          placeholder="Reservation Date"
+          className="form-control"
+          placeholder="MM/DD/YYYY"
+          pattern="\d{4}-\d{2}-\d{2}"
           onChange={handleChange}
           value={formData.reservation_date}
           required
@@ -138,6 +181,7 @@ export default function NewReservation({ setReservations }) {
           type="time"
           placeholder="HH:MM"
           pattern="[0-9]{2}:[0-9]{2}"
+          className="form-control"
           onChange={handleChange}
           value={formData.reservation_time}
           required

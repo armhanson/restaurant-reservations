@@ -29,12 +29,11 @@ function update(reservation_id, status) {
     .then((theNewStuff) => theNewStuff[0]);
 }
 
-function finish(reservation_id, status) {
+function updateReservation(reservation) {
   return knex(tableName)
-    .where({ reservation_id })
-    .update("status", status)
-    .returning("*")
-    .then((finished) => finished[0]);
+    .select("*")
+    .where({ reservation_id: reservation.reservation_id })
+    .update(reservation, "*")
 }
 
 function search(mobile_phone) {
@@ -51,6 +50,6 @@ module.exports = {
   list,
   read,
   update,
-  finish,
+  updateReservation,
   search,
 };
