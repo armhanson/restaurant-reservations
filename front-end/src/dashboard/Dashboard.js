@@ -1,12 +1,9 @@
-import React, { useEffect, useState } from "react";
-import { listReservations, listTables } from "../utils/api";
+import React from "react";
 import ErrorAlert from "../layout/ErrorAlert";
 import { previous, today, next } from "../utils/date-time";
 import { useHistory } from "react-router-dom";
-import TableRow from "./TableRow";
-import ReservationRow from "./ReservationRow";
 import ListTables from "../tables/ListTables";
-import ListReservations from "../reservations/ListReservations"
+import ListReservations from "../reservations/ListReservations";
 
 /**
  * Defines the dashboard page.
@@ -14,38 +11,17 @@ import ListReservations from "../reservations/ListReservations"
  *  the date for which the user wants to view reservations.
  * @returns {JSX.Element}
  */
-function Dashboard({ date }) {
+function Dashboard({
+  cancelHandler,
+  date,
+  reservations,
+  setReservations,
+  reservationsError,
+  tables,
+  setTables,
+  tablesError,
+}) {
   const history = useHistory();
-  const [reservations, setReservations] = useState([]);
-  const [reservationsError, setReservationsError] = useState(null);
-  const [tables, setTables] = useState([]);
-  const [tablesError, setTablesError] = [];
-
-  useEffect(loadDashboard, [date]);
-
-  function loadDashboard() {
-    const abortController = new AbortController();
-    setReservationsError(null);
-    listReservations({ date }, abortController.signal)
-      .then(setReservations)
-      .catch(setReservationsError);
-    listTables(abortController.signal).then(setTables).catch(setTablesError);
-    return () => abortController.abort();
-  }
-
-  const reservationsJSX = () => {
-    return reservations.map((reservation) => (
-      <ReservationRow
-        key={reservation.reservation_id}
-        reservation={reservation}
-      />
-    ));
-  };
-  const tablesJSX = () => {
-    return tables.map((table) => (
-      <TableRow key={table.table_id} table={table} />
-    ));
-  };
 
   return (
     <main>
@@ -53,23 +29,9 @@ function Dashboard({ date }) {
       <div className="d-md-flex mb-3">
         <h4 className="mb-0">Reservations for {date}</h4>
       </div>
-      <ErrorAlert error={reservationsError} />
-
-      <ListReservations reservations={reservations} />
-      
-      {reservationsJSX}
-
-      <h4 className="mb-0">Tables</h4>
-
-      <ErrorAlert error={tablesError} />
-
-      <ListTables tables={tables} />
-
-      {tablesJSX}
-
       {/*//////////// PREVIOUS //////////////*/}
       <button
-        type="button"
+        className="btn btn-info m-1 p-3"
         onClick={() => history.push(`/dashboard?date=${previous(date)}`)}
       >
         Previous
@@ -77,7 +39,7 @@ function Dashboard({ date }) {
 
       {/*//////////// TODAY //////////////*/}
       <button
-        type="button"
+        className="btn btn-dark m-1 p-3"
         onClick={() => history.push(`/dashboard?date=${today()}`)}
       >
         Today
@@ -85,11 +47,32 @@ function Dashboard({ date }) {
 
       {/*//////////// NEXT //////////////*/}
       <button
-        type="button"
+        className="btn btn-info m-1 p-3"
         onClick={() => history.push(`/dashboard?date=${next(date)}`)}
       >
         Next
       </button>
+
+      {/*////////// DISPLAY COMPONENTS CALLS //////////*/}
+
+      <ErrorAlert error={reservationsError} />
+
+      <ListReservations
+        reservations={reservations}
+        setReservations={setReservations}
+        cancelHandler={cancelHandler}
+      />
+
+      <h4 className="mb-0">Tables</h4>
+
+      <ErrorAlert error={tablesError} />
+
+      <ListTables
+        tables={tables}
+        setTables={setTables}
+        date={date}
+        setReservations={setReservations}
+      />
     </main>
   );
 }

@@ -2,16 +2,19 @@ import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 import ErrorAlert from "../layout/ErrorAlert";
 import { createTable } from "../utils/api";
+import { today } from "../utils/date-time";
 
-export default function NewTable() {
+export default function NewTable({ tables, setTables }) {
   const history = useHistory();
-  const todaysDate = new Date();
-  const [error, setError] = useState([]);
+  const todaysDate = today();
+  const [error, setError] = useState(null);
   const [formData, setFormData] = useState({
     // initial (default) data
     table_name: "",
-    capacity: 1,
+    capacity: 0,
   });
+
+  ////////// VALIDATE FIELDS ///////////
 
   function validateFields() {
     let foundError = "";
@@ -23,7 +26,7 @@ export default function NewTable() {
         foundError += "Table name must be at least 2 characters.";
       }
       if (formData.capacity < 1 || !formData.capacity) {
-        foundError += "Table name must be at least 1.";
+        foundError += "Table capacity must be at least 1.";
       }
     }
 
@@ -44,16 +47,19 @@ export default function NewTable() {
     setError(null);
     if (validateFields()) {
       createTable(formData, abortController.signal)
-        .then(() => history.push("/dashboard"))
+        .then((returnedTable) =>
+          setTables([...tables, { ...returnedTable, status: "free" }])
+        )
+        .then(() => history.push(`/dashboard?date=${todaysDate}`))
         .catch(setError);
     }
   }
 
   return (
     <form onSubmit={handleSubmit}>
-      <ErrorAlert error={error} />
+      {error ? <ErrorAlert error={error} /> : ""}
 
-      <label htmlFor="table_name">Table Name:&nbsp;</label>
+      <label htmlFor="table_name" className="mr-1">Table Name:&nbsp;</label>
       <input
         name="table_name"
         id="table_name"
@@ -64,7 +70,7 @@ export default function NewTable() {
         required
       />
 
-      <label htmlFor="capacity">Capacity:&nbsp;</label>
+      <label htmlFor="capacity" className="my-4 ml-2 mr-1">Capacity:&nbsp;</label>
       <input
         name="capacity"
         id="capacity"
@@ -76,8 +82,8 @@ export default function NewTable() {
       />
       <br />
 
-      <button type="submit">Submit</button>
-      <button type="button" onClick={history.goBack}>
+      <button type="submit" className="btn btn-dark m-2 p-3">Submit</button>
+      <button className="btn btn-danger p-3" onClick={history.goBack}>
         Cancel
       </button>
     </form>

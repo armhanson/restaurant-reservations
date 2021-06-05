@@ -1,9 +1,17 @@
-import React, { useState } from "react";
-import { useHistory } from "react-router-dom";
-import { createReservation, formatPhoneNumber } from "../utils/api";
+import React, { useEffect, useState } from "react";
+import { useHistory, useParams } from "react-router-dom";
+import {
+  createReservation,
+  editReservation,
+  formatPhoneNumber,
+  readReservation,
+} from "../utils/api";
 import ErrorAlert from "../layout/ErrorAlert";
 
-export default function NewReservation() {
+export default function NewReservation({
+  edit,
+  loadDashboard,
+}) {
   const [errors, setErrors] = useState(null);
   const history = useHistory();
   const [formData, setFormData] = useState({
@@ -15,43 +23,71 @@ export default function NewReservation() {
     people: 1,
   });
 
+  ////////// EDIT FORM POPULATION ///////////
+
+  const { reservation_id } = useParams();
+
+  useEffect(() => {
+    const abortController = new AbortController();
+    if (reservation_id) {
+      readReservation(reservation_id, abortController.signal)
+        .then((foundRes) => {
+
+          setFormData({
+            ...foundRes,
+            reservation_date: new Date(foundRes.reservation_date)
+              .toISOString()
+              .substr(0, 10),
+          });
+        })
+        .catch(setErrors);
+    }
+    return () => abortController.abort();
+  }, [reservation_id]);
+
+  //////////// DATE & TIME VALIDATION /////////////
+
   function valiDate() {
     const reserveDate = new Date(formData.reservation_date);
     const reserveTime = formData.reservation_time;
-    const todaysDate = new Date();
+    const todaysDate = Date.now();
+    const dateAndTime = new Date(
+      `${formData.reservation_date}T${formData.reservation_time}`
+    );
     const foundErrors = [];
 
-    // this test sometimes references Tue as 1, sometimes as 2
     if (reserveDate.getDay() === 1) {
-      foundErrors.push({
-        message:
-          "Reservations cannot be made on a Tuesday (Restaurant is closed).",
-      });
+      foundErrors.push(
+        "Reservations cannot be made on a Tuesday (Restaurant is closed)."
+      );
     }
 
-    if (reserveDate < todaysDate) {
-      foundErrors.push({ message: "Reservations cannot be made in the past." });
+    if (dateAndTime.getTime() < todaysDate) {
+      foundErrors.push("Reservations cannot be made in the past.");
     }
 
     if (reserveTime.localeCompare("10:30") === -1) {
-      foundErrors.push({
-        message:
-          "Reservation cannot be made: Restaurant is not open until 10:30AM.",
-      });
+      foundErrors.push(
+        "Reservation cannot be made: Restaurant is not open until 10:30AM."
+      );
     } else if (reserveTime.localeCompare("21:30") === 1) {
-      foundErrors.push({
-        message:
-          "Reservation cannot be made: Restaurant is closed after 9:30PM.",
-      });
+      foundErrors.push(
+        "Reservation cannot be made: Restaurant is closed after 9:30PM."
+      );
     } else if (reserveTime.localeCompare("20:30") === 1) {
-      foundErrors.push({
-        message:
-          "Reservation cannot be made: Reservation must be made before 8:30PM.",
-      });
+      foundErrors.push(
+        "Reservation cannot be made: Reservation must be made before 8:30PM."
+      );
     }
 
-    return foundErrors;
+    if (foundErrors.length) {
+      setErrors(new Error(foundErrors.toString()));
+      return false;
+    }
+    return true;
   }
+
+  /////////// FORM ENTRY HANDLERS ////////////
 
   function handleChange({ target }) {
     setFormData({ ...formData, [target.name]: target.value });
@@ -65,24 +101,40 @@ export default function NewReservation() {
     });
   };
 
-  async function handleSubmit(event) {
+  function handleSubmit(event) {
     event.preventDefault();
+    const abortController = new AbortController();
     setErrors(null);
-    const errorsArr = valiDate();
-    if (!errorsArr.length) {
-      await createReservation(formData);
-      history.push(`/dashboard?date=${formData.reservation_date}`);
-    } else {
-      const errorMessage = { message: `${errorsArr.join(", ").trim()}.` };
-      setErrors(errorMessage);
+    const validDate = valiDate();
+
+    if (validDate) {
+      if (edit) {
+        editReservation(formData, reservation_id, abortController.signal)
+          .then(() => {
+
+            return loadDashboard();
+          })
+          .then(() =>
+            history.push(`/dashboard?date=${formData.reservation_date}`)
+          )
+          .catch(setErrors);
+      } else {
+        createReservation(formData, abortController.signal)
+          .then(loadDashboard)
+          .then(() =>
+            history.push(`/dashboard?date=${formData.reservation_date}`)
+          )
+          .catch(setErrors);
+      }
     }
+    return () => abortController.abort();
   }
 
   return (
     <>
       <form onSubmit={handleSubmit}>
-        { errors && <ErrorAlert error={errors} /> }
-        <label htmlFor="first_name">First Name:&nbsp;</label>
+        <ErrorAlert error={errors} />
+        <label htmlFor="first_name" className="mt-3 mr-1">First Name:&nbsp;</label>
         <input
           name="first_name"
           id="first_name"
@@ -92,7 +144,7 @@ export default function NewReservation() {
           value={formData.first_name}
           required
         />
-        <label htmlFor="last_name">Last Name:&nbsp;</label>
+        <label htmlFor="last_name" className="mt-3 ml-3">Last Name:&nbsp;</label>
         <input
           name="last_name"
           id="last_name"
@@ -103,7 +155,7 @@ export default function NewReservation() {
           required
         />
         <br />
-        <label htmlFor="mobile_number">Mobile Number:&nbsp;</label>
+        <label htmlFor="mobile_number" className="mt-3 mr-1">Mobile Number:&nbsp;</label>
         <input
           name="mobile_number"
           id="mobile_number"
@@ -119,7 +171,9 @@ export default function NewReservation() {
           name="reservation_date"
           id="reservation_date"
           type="date"
-          placeholder="Reservation Date"
+          className="form-control mb-2"
+          placeholder="MM/DD/YYYY"
+          pattern="\d{4}-\d{2}-\d{2}"
           onChange={handleChange}
           value={formData.reservation_date}
           required
@@ -131,6 +185,7 @@ export default function NewReservation() {
           type="time"
           placeholder="HH:MM"
           pattern="[0-9]{2}:[0-9]{2}"
+          className="form-control mb-2"
           onChange={handleChange}
           value={formData.reservation_time}
           required
@@ -143,13 +198,14 @@ export default function NewReservation() {
           type="number"
           min="1"
           max="25"
+          className="m-3"
           onChange={handleChange}
           value={formData.people}
           required
         />
         <br />
-        <button type="submit">Submit</button>
-        <button type="button" onClick={history.goBack}>
+        <button type="submit" className="btn btn-dark mr-2 p-3">Submit</button>
+        <button type="button" className="btn btn-danger p-3" onClick={history.goBack}>
           Cancel
         </button>
       </form>

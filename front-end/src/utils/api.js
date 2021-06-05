@@ -5,7 +5,7 @@
 import formatReservationDate from "./format-reservation-date";
 import formatReservationTime from "./format-reservation-date";
 
-const API_BASE_URL =
+export const API_BASE_URL =
   process.env.REACT_APP_API_BASE_URL || "http://localhost:5000";
 
 /**
@@ -60,9 +60,9 @@ async function fetchJson(url, options, onCancel) {
 
 export async function listReservations(params, signal) {
   const url = new URL(`${API_BASE_URL}/reservations`);
-  Object.entries(params).forEach(([key, value]) =>
-    url.searchParams.append(key, value.toString())
-  );
+  Object.entries(params).forEach(([key, value]) => {
+    return url.searchParams.append(key, value.toString());
+  });
   return await fetchJson(url, { headers, signal }, [])
     .then(formatReservationDate)
     .then(formatReservationTime);
@@ -130,18 +130,54 @@ export async function updateTable(table_id, reservation_id, signal) {
   return await fetchJson(
     url,
     {
-      body: JSON.stringify({ data: { reservation_id } }),
-      headers,
       method: "PUT",
+      headers,
+      body: JSON.stringify({ data: { reservation_id } }),
       signal,
     },
     []
   );
 }
 
-export async function updateReservationStatus() {}
+export async function updateReservationStatus(reservation_id, status, signal) {
+  const url = `${API_BASE_URL}/reservations/${reservation_id}/status`;
+  console.log(status)
+  return await fetchJson(
+    url,
+    {
+      method: "PUT",
+      headers,
+      body: JSON.stringify({ data: {status} }),
+      signal,
+    },
+    []
+  );
+}
+
+export async function editReservation(reservation, reservation_id, signal) {
+  const url = `${API_BASE_URL}/reservations/${reservation_id}`;
+
+  return await fetchJson(
+    url,
+    {
+      method: "PUT",
+      headers,
+      body: JSON.stringify({ data: reservation }),
+      signal,
+    },
+    []
+  );
+}
 
 export async function deletePartyFromTable(table_id, signal) {
   const url = `${API_BASE_URL}/tables/${table_id}/seat`;
-  return await fetch(url, { headers, method: "DELETE", signal }, []);
+  return await fetch(
+    url,
+    {
+      method: "DELETE",
+      headers,
+      signal,
+    },
+    []
+  );
 }
