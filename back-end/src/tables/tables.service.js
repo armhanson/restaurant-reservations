@@ -26,6 +26,8 @@ function update(updatedTable) {
     .then((theNewStuff) => theNewStuff[0]);
 }
 
+///////// STATUS UPDATE SERVICE //////////
+
 function destroy(table_id, reservationId) {
   return knex(tableName)
     .where({ table_id })

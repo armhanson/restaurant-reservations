@@ -115,40 +115,7 @@ function validateFields(req, res, next) {
   next();
 }
 
-function statusCreateValidation(req, res, next) {
-  const status = req.body.data.status;
-
-  if (status === "seated") {
-    return next({
-      status: 400,
-      message: "Reservation has been seated.",
-    });
-  }
-
-  next();
-}
-
-function statusValidation(req, res, next) {
-  const status = req.body.data.status;
-
-  if (status === "seated") {
-    return next({
-      status: 400,
-      message: "Reservation has been seated.",
-    });
-  }
-
-  if (status) {
-    return next({
-      status: 400,
-      message: "Unknown status.",
-    });
-  }
-
-  next();
-}
-
-//////////// END ///////////////
+//////////// END OF VALIDATE FIELDS ///////////////
 
 //////// UPDATE VALIDATION ////////
 
@@ -176,6 +143,8 @@ function updateValidation(req, res, next) {
 
   return next();
 }
+
+//////// CRUD //////////
 
 async function list(req, res) {
   const { date, mobile_number } = req.query;

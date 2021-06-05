@@ -23,7 +23,7 @@ export default function NewReservation({
     people: 1,
   });
 
-
+  ////////// EDIT FORM POPULATION ///////////
 
   const { reservation_id } = useParams();
 
@@ -44,6 +44,8 @@ export default function NewReservation({
     }
     return () => abortController.abort();
   }, [reservation_id]);
+
+  //////////// DATE & TIME VALIDATION /////////////
 
   function valiDate() {
     const reserveDate = new Date(formData.reservation_date);
@@ -84,6 +86,8 @@ export default function NewReservation({
     }
     return true;
   }
+
+  /////////// FORM ENTRY HANDLERS ////////////
 
   function handleChange({ target }) {
     setFormData({ ...formData, [target.name]: target.value });

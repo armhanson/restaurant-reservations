@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { listReservationsForPhoneNumber } from "../utils/api";
-import ListReservations from "./ListReservations"; // this component is only used after the form has been submitted
+import ListReservations from "./ListReservations"; // USED TO POPULATE RESULTS FROM SEARCH
 
 export default function Search() {
   const [list, setList] = useState([]);
@@ -24,17 +24,17 @@ export default function Search() {
 
   return (
     <div>
-      <h2>Search</h2>
+      <h2 className="mt-3 ml-3">Search</h2>
       <form name="reservation" onSubmit={handleSearch}>
         <input
-          className="m-3"
+          className="ml-3"
           type="text"
           name="mobile_number"
-          placeholder="Enter a customer's phone number"
+          placeholder="Enter customer's phone number"
           onChange={handleChange}
           value={mobileNumber}
         ></input>
-        <button type="submit" className="btn btn-primary mt-2">
+        <button type="submit" className="btn btn-primary m-2">
           Find
         </button>
       </form>

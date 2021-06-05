@@ -20,24 +20,8 @@ function Dashboard({
   tables,
   setTables,
   tablesError,
-  setTablesError,
 }) {
   const history = useHistory();
-
-  // const reservationsJSX = () => {
-  //   return reservations.map((reservation) => (
-  //     <ReservationRow
-  //       key={reservation.reservation_id}
-  //       reservation={reservation}
-  //     />
-  //   ));
-  // };
-
-  // const tablesJSX = () => {
-  //   return tables.map((table) => (
-  //     <TableRow key={table.table_id} table={table} />
-  //   ));
-  // };
 
   return (
     <main>
@@ -68,16 +52,27 @@ function Dashboard({
       >
         Next
       </button>
-      
+
+      {/*////////// DISPLAY COMPONENTS CALLS //////////*/}
+
       <ErrorAlert error={reservationsError} />
 
-      <ListReservations reservations={reservations} setReservations={setReservations} cancelHandler={cancelHandler} />
+      <ListReservations
+        reservations={reservations}
+        setReservations={setReservations}
+        cancelHandler={cancelHandler}
+      />
 
       <h4 className="mb-0">Tables</h4>
 
       <ErrorAlert error={tablesError} />
 
-      <ListTables tables={tables} setTables={setTables} date={date} setReservations={setReservations} />
+      <ListTables
+        tables={tables}
+        setTables={setTables}
+        date={date}
+        setReservations={setReservations}
+      />
     </main>
   );
 }

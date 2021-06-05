@@ -12,6 +12,8 @@ function notNull(obj) {
   return true;
 }
 
+////////// VALIDATE FIELDS ////////////
+
 function validateFields(req, res, next) {
   const { data = {} } = req.body;
 
@@ -53,6 +55,7 @@ function validateFields(req, res, next) {
 }
 
 ////////// INITIAL UPDATE VALIDATION /////////
+
 async function tableExists(req, res, next) {
   const tableId = req.params.table_id;
   const table = await service.read(tableId);
@@ -69,6 +72,7 @@ async function tableExists(req, res, next) {
 }
 
 /////////// SECONDARY UPDATE VALIDATION ////////////
+
 async function updateValidation(req, res, next) {
   const table = res.locals.table;
   const data = req.body.data;
@@ -135,6 +139,8 @@ function deleteValidation(req, res, next) {
   return next();
 }
 
+/////////// CRUD ///////////
+
 async function create(req, res) {
   const data = await service.create(req.body.data);
   res.status(201).json({ data });
@@ -148,6 +154,8 @@ async function read(req, res) {
   const { table } = await res.locals;
   res.json({ data: table });
 }
+
+/////////// STATUS UPDATE CONTROLLER //////////
 
 async function update(req, res) {
   const updatedTable = await {

@@ -14,6 +14,8 @@ export default function NewTable({ tables, setTables }) {
     capacity: 0,
   });
 
+  ////////// VALIDATE FIELDS ///////////
+
   function validateFields() {
     let foundError = "";
 

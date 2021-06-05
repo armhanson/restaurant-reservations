@@ -6,6 +6,8 @@ import { deletePartyFromTable, listTables, listReservations } from "../utils/api
 export default function ListTables({ tables, setTables, setReservations }) {
   const query = useQuery();
   const date = query.get("date") || today();
+
+  ///////////// FINISH TABLE ////////////
   
   function handleFinish({ table_id }) {
     const result = window.confirm(

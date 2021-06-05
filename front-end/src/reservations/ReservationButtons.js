@@ -1,6 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
+////////// RESERVATION BUTTON DESIGN ////////////
+
 export default function ReservationButtons({
   status,
   reservation_id,

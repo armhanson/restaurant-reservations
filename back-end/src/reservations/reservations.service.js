@@ -20,7 +20,6 @@ function read(reservation_id) {
   return knex(tableName).where({ reservation_id }).first();
 }
 
-// reervation_id is the status pulled from res.locals in controller
 function update(reservation_id, status) {
   return knex(tableName)
     .where({ reservation_id })

@@ -3,6 +3,7 @@ import { useHistory } from "react-router-dom";
 
 export default function SeatReservation({ tables }) {
   const history = useHistory();
+  
   return (
     <div>
       <button type="button" className="m-2">

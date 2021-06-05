@@ -4,17 +4,17 @@ import NotFound from "./NotFound";
 import useQuery from "../utils/useQuery";
 import NewTable from "../tables/NewTable";
 import { today } from "../utils/date-time";
+import Search from "../reservations/Search";
 import Dashboard from "../dashboard/Dashboard";
+import SeatConfirm from "../reservations/SeatConfirm";
 import { Redirect, Route, Switch } from "react-router-dom";
+import NewReservation from "../reservations/NewReservation";
+import SeatReservation from "../reservations/SeatReservation";
 import {
   listReservations,
   listTables,
   updateReservationStatus,
 } from "../utils/api";
-import NewReservation from "../reservations/NewReservation";
-import SeatConfirm from "../reservations/SeatConfirm";
-import SeatReservation from "../reservations/SeatReservation";
-import Search from "../reservations/Search";
 
 /**
  * Defines all the routes for the application.
@@ -23,6 +23,7 @@ import Search from "../reservations/Search";
  *
  * @returns {JSX.Element}
  */
+
 function Routes() {
   const [reservations, setReservations] = useState([]);
   const [reservationsError, setReservationsError] = useState(null);
@@ -31,8 +32,10 @@ function Routes() {
 
   const query = useQuery();
   const date = query.get("date") ? query.get("date") : today();
-  // render dashboard anytime new date or setTablesError occurs
+
   useEffect(loadDashboard, [date]);
+
+  ////////// MAIN DASHBOARD RENDERING FUNCTION //////////
 
   function loadDashboard() {
     const abortController = new AbortController();
@@ -52,12 +55,13 @@ function Routes() {
     return () => abortController.abort();
   }
 
+  ////////////// STATUS ////////////////
+
   function cancelHandler(reservation_id) {
     const abortController = new AbortController();
 
     updateReservationStatus(reservation_id, "cancelled", abortController.status)
       .then(() => {
-        console.log("update successful");
         return loadDashboard();
       })
       .catch(setReservationsError);
@@ -72,12 +76,18 @@ function Routes() {
       <Route exact={true} path="/reservations">
         <Redirect to={"/dashboard"} />
       </Route>
+
+      {/* CREATE RESERVATION */}
+
       <Route exact={true} path="/reservations/new">
         <NewReservation
           setReservations={setReservations}
           loadDashboard={loadDashboard}
         />
       </Route>
+
+      {/* EDIT RESERVATION */}
+
       <Route exact={true} path="/reservations/:reservation_id/edit">
         <NewReservation
           setReservations={setReservations}
@@ -86,9 +96,15 @@ function Routes() {
           reservations={reservations}
         />
       </Route>
+
+      {/* CREATE TABLE */}
+      
       <Route exact={true} path="/tables/new">
         <NewTable tables={tables} setTables={setTables} />
       </Route>
+
+      {/* HOME PAGE RENDERING ORIGIN */}
+
       <Route exact={true} path="/dashboard">
         <Dashboard
           cancelHandler={cancelHandler}
@@ -102,6 +118,9 @@ function Routes() {
           setTablesError={setTablesError}
         />
       </Route>
+
+      {/* STATUS CHANGE */}
+
       <Route exact={true} path={`/reservations/:reservation_id/seat`}>
         <SeatReservation
           tables={tables}
@@ -109,9 +128,9 @@ function Routes() {
           setReservations={setReservations}
         />
       </Route>
-      <Route exact={true} path={`/reservations/seat-confirm`}>
-        <SeatConfirm tables={tables} />
-      </Route>
+
+      {/* SEARCH */}
+
       <Route exact={true} path={`/search`}>
         <Search reservations={reservations} setReservations={setReservations} />
       </Route>
