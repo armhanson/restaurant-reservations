@@ -30,7 +30,7 @@ export default function ListTables({ tables, setTables, setReservations }) {
 
   if (tables) {
     return tables.map((table) => (
-      <div className="card m-1" key={table.table_id}>
+      <div className="card mx-1 my-2" key={table.table_id}>
         <div className="card-body bg-secondary text-light">
           <h4 className="card-title">{table.table_name}</h4>
           <p className="card-text">{table.capacity}</p>
