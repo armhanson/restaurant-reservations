@@ -83,12 +83,12 @@ export default function SeatReservation({ tables, setTables, setReservations }) 
             </select>
           </div>
           <div>
-            <button className="btn btn-dark m-2" type="submit">
+            <button className="btn btn-secondary m-2" type="submit">
               Submit
             </button>
             <button
               onClick={() => history.goBack()}
-              className="btn btn-secondary"
+              className="btn btn-danger"
             >
               Cancel
             </button>

@@ -11,7 +11,7 @@ export default function ListReservations({ cancelHandler, reservations }) {
     return filteredReservations.map((reservation) => {
       return (
         <div key={reservation.reservation_id}>
-          <div className="card">
+          <div className="card bg-dark text-light m-1">
             <div className="card-body">
               <h4 className="card-title">
                 Reservation for: {reservation.first_name}{" "}

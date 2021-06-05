@@ -31,7 +31,7 @@ export default function ReservationButtons({
         </Link>
         <Link
           to={`/reservations/${reservation_id}/edit`}
-          className="btn btn-light m-2"
+          className="btn btn-secondary m-2"
         >
           Edit
         </Link>

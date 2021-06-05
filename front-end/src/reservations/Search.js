@@ -34,7 +34,7 @@ export default function Search() {
           onChange={handleChange}
           value={mobileNumber}
         ></input>
-        <button type="submit" className="btn btn-primary m-2">
+        <button type="submit" className="btn btn-info m-2 p-3">
           Find
         </button>
       </form>

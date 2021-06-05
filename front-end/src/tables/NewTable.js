@@ -59,7 +59,7 @@ export default function NewTable({ tables, setTables }) {
     <form onSubmit={handleSubmit}>
       {error ? <ErrorAlert error={error} /> : ""}
 
-      <label htmlFor="table_name">Table Name:&nbsp;</label>
+      <label htmlFor="table_name" className="mr-1">Table Name:&nbsp;</label>
       <input
         name="table_name"
         id="table_name"
@@ -70,7 +70,7 @@ export default function NewTable({ tables, setTables }) {
         required
       />
 
-      <label htmlFor="capacity">Capacity:&nbsp;</label>
+      <label htmlFor="capacity" className="my-4 ml-2 mr-1">Capacity:&nbsp;</label>
       <input
         name="capacity"
         id="capacity"
@@ -82,8 +82,8 @@ export default function NewTable({ tables, setTables }) {
       />
       <br />
 
-      <button type="submit">Submit</button>
-      <button type="button" onClick={history.goBack}>
+      <button type="submit" className="btn btn-dark m-2 p-3">Submit</button>
+      <button className="btn btn-danger p-3" onClick={history.goBack}>
         Cancel
       </button>
     </form>

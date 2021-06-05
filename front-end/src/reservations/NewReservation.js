@@ -134,7 +134,7 @@ export default function NewReservation({
     <>
       <form onSubmit={handleSubmit}>
         <ErrorAlert error={errors} />
-        <label htmlFor="first_name">First Name:&nbsp;</label>
+        <label htmlFor="first_name" className="mt-3 mr-1">First Name:&nbsp;</label>
         <input
           name="first_name"
           id="first_name"
@@ -144,7 +144,7 @@ export default function NewReservation({
           value={formData.first_name}
           required
         />
-        <label htmlFor="last_name">Last Name:&nbsp;</label>
+        <label htmlFor="last_name" className="mt-3 ml-3">Last Name:&nbsp;</label>
         <input
           name="last_name"
           id="last_name"
@@ -155,7 +155,7 @@ export default function NewReservation({
           required
         />
         <br />
-        <label htmlFor="mobile_number">Mobile Number:&nbsp;</label>
+        <label htmlFor="mobile_number" className="mt-3 mr-1">Mobile Number:&nbsp;</label>
         <input
           name="mobile_number"
           id="mobile_number"
@@ -171,7 +171,7 @@ export default function NewReservation({
           name="reservation_date"
           id="reservation_date"
           type="date"
-          className="form-control"
+          className="form-control mb-2"
           placeholder="MM/DD/YYYY"
           pattern="\d{4}-\d{2}-\d{2}"
           onChange={handleChange}
@@ -185,7 +185,7 @@ export default function NewReservation({
           type="time"
           placeholder="HH:MM"
           pattern="[0-9]{2}:[0-9]{2}"
-          className="form-control"
+          className="form-control mb-2"
           onChange={handleChange}
           value={formData.reservation_time}
           required
@@ -198,13 +198,14 @@ export default function NewReservation({
           type="number"
           min="1"
           max="25"
+          className="m-3"
           onChange={handleChange}
           value={formData.people}
           required
         />
         <br />
-        <button type="submit">Submit</button>
-        <button type="button" onClick={history.goBack}>
+        <button type="submit" className="btn btn-dark mr-2 p-3">Submit</button>
+        <button type="button" className="btn btn-danger p-3" onClick={history.goBack}>
           Cancel
         </button>
       </form>

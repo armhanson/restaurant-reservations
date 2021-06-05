@@ -6,7 +6,6 @@ import NewTable from "../tables/NewTable";
 import { today } from "../utils/date-time";
 import Search from "../reservations/Search";
 import Dashboard from "../dashboard/Dashboard";
-import SeatConfirm from "../reservations/SeatConfirm";
 import { Redirect, Route, Switch } from "react-router-dom";
 import NewReservation from "../reservations/NewReservation";
 import SeatReservation from "../reservations/SeatReservation";
