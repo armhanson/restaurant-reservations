@@ -10,7 +10,7 @@
 
 ### Languages and Frameworks - JavaScript, React.js, HTML5, PostgreSQL, Express.js, Knex.js
 
-## Project Map
+# Project Map
 
 ### URL Path: / or /dashboard
 
@@ -28,7 +28,7 @@
 
 ##### Selecting the 'New Table' option from the navigation bar will render an input form to utilize the create method and render a new table on at "/", or the "/dashboard" route. If no reservations are found, a message will render to notify the user. Cancel button returns to the previous page.
 
-## Running Locally
+# Running Locally
 
 ### If you would like to use the app locally to see it in action, follow this setup guide:
 
