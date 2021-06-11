@@ -32,26 +32,26 @@
 
 ### If you would like to use the app locally to see it in action, follow this setup guide:
 
-| #### | 1. Clone Repo or download .zip
-#### | 2. Open terminal and navigate to parent folder for project 
-##### |  a. Enter command: npm install
-##### |  b. Enter command: cd front-end && npm install
-##### |  c. Enter command: cd ../back-end && npm install
-#### | 3. Create two PostgreSQL databases to test and run app, one designated 'developmment', the other 'test'
-#### | 4. Open project in your editor (i.e., VS Code) and create the appropriate .env files in the front-end and back-end folders
-##### |  a. *FRONT-END* file:
-##### |     DATABASE_URL_DEVELOPMENT=*enter url for development database inside asteriks, remove asteriks*
-##### |     DATABASE_URL_TEST=*enter url for test database inside asteriks, remove asteriks*
-##### |  b. *BACK-END* file:
-##### |     REACT_APP_API_BASE_URL=http://localhost:5000
-##### | 5. Open terminal and navigate to back-end folder:
-##### |  a. Enter command: npx knex migrate:latest
-##### |  b. Enter command: npx knex seed:run
-##### | 6. Navigate to parent folder:
-##### |     Enter command: npm run start:dev
-##### | 7. To run tests (some of which will not work) enter commands from parent folder:
-##### |  a. Enter command: test:frontend  OR
-##### |  b. Enter command: test:backend
+| 1. Clone Repo or download .zip
+| 2. Open terminal and navigate to parent folder for project 
+|   a. Enter command: npm install
+|   b. Enter command: cd front-end && npm install
+|   c. Enter command: cd ../back-end && npm install
+| 3. Create two PostgreSQL databases to test and run app, one designated 'developmment', the other 'test'
+| 4. Open project in your editor (i.e., VS Code) and create the appropriate .env files in the front-end and back-end folders
+|   a. *FRONT-END* file:
+|     DATABASE_URL_DEVELOPMENT=*enter url for development database inside asteriks, remove asteriks*
+|     DATABASE_URL_TEST=*enter url for test database inside asteriks, remove asteriks*
+|   b. *BACK-END* file:
+|     REACT_APP_API_BASE_URL=http://localhost:5000
+| 5. Open terminal and navigate to back-end folder:
+|   a. Enter command: npx knex migrate:latest
+|   b. Enter command: npx knex seed:run
+| 6. Navigate to parent folder:
+|      Enter command: npm run start:dev
+| 7. To run tests (some of which will not work) enter commands from parent folder:
+|   a. Enter command: test:frontend  OR
+|   b. Enter command: test:backend
 
 #### You will now be able to use the app in your browser at local host 3000 (preferrably Chrome), updating your development database with entries you submit through the forms.
 
