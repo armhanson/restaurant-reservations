@@ -8,7 +8,7 @@
 ##### Create, edit, seat, and cancel reservations.
 ##### Keep a record of all reservations, whether booked, canceled, or seated.
 
-### Languages and Frameworks - JavaScript, React.js, HTML5, PostgreSQL, Express, Knex
+### Languages and Frameworks - JavaScript, React.js, HTML5, PostgreSQL, Express.js, Knex.js
 
 ## Project Map
 
