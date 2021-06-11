@@ -32,7 +32,7 @@
 
 ### If you would like to use the app locally to see it in action, follow this setup guide:
 
-#### | 1. Clone Repo or download .zip
+| #### | 1. Clone Repo or download .zip
 #### | 2. Open terminal and navigate to parent folder for project 
 ##### |  a. Enter command: npm install
 ##### |  b. Enter command: cd front-end && npm install
