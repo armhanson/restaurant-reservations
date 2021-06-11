@@ -1,6 +1,6 @@
 # Periodic Tables - Restaurant Reservations by Andrew Hanson
 
-#### Andrew Hanson is a software developer originally based in Chicago, IL. He has worked in in the development scene since 2015 and has been active in web development since 2021.
+#### Andrew Hanson is a software developer originally based in Chicago, IL. He has worked in the development scene since 2015 and has been active in web development since 2021.
 
 ## Periodic Tables is a restaurant reservations scheduling and seating tool.
 
